@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="impl-demo-suite.xml" />
+	<!-- <munit:test name="sf-call-user-by-id-test" doc:id="9710e5a4-f2de-430c-8e6d-ecd411cd3317" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="4752d4dc-6cd7-48b9-a79d-203d11863a68" >
+				<munit:payload value="#[readUrl('classpath://sfcalluserbyidtest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://sfcalluserbyidtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://sfcalluserbyidtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to sf-call-user-by-id" doc:id="01b2aa89-0ad5-46b5-a4ef-ce3cb26415fb" name="sf-call-user-by-id"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="1016b26f-2fce-4667-9ae4-ff441bc9b625" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import sfcalluserbyidtest::assert_expression_payload
+-&#45;&#45;
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test> -->
+	<munit:test name="sf-call-users-test" doc:id="a54c0812-172d-4ae1-a9e9-ca8eabbda318" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock sf-call-mock-sapi" doc:id="2cca8c38-29d5-4717-92ac-57f06daa5e8f" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="4817b78a-2d33-4955-862b-20c3b3817098" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json --- readUrl('classpath://sfcalluserstest\mock_payload.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://sfcalluserstest\mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="path" value="#[output application/java --- readUrl('classpath://sfcalluserstest\mock_variable_.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="request" value="#[output application/java --- readUrl('classpath://sfcalluserstest\mock_variable_1.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="uriParameters" value="#[output application/java --- readUrl('classpath://sfcalluserstest\mock_variable_2.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://sfcalluserstest\mock_variable_3.dwl')]" />
+						<munit-tools:variable key="method" value="#[output application/java --- readUrl('classpath://sfcalluserstest\mock_variable_4.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="queryParameters" value="#[output application/java --- readUrl('classpath://sfcalluserstest\mock_variable_5.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="660ca6e9-dd4b-4e52-baa7-4f8654c7084d" >
+				<munit:payload value="#[readUrl('classpath://sfcalluserstest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://sfcalluserstest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://sfcalluserstest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to sf-call-users" doc:id="2979363b-2156-4cd2-a8ab-def2c046df29" name="sf-call-users"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="453d9b20-c664-4467-9ca4-4a3ecc21a303" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import sfcalluserstest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="sf-call-user-by-id-test" doc:id="b9940dba-049d-4923-b6e4-d32b9eda6e5e" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock sf-call-mock-sapi" doc:id="d92dc193-4569-4141-82fd-97015f99c230" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="929352a7-6ea4-4d3e-8b92-dac4233415db" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json --- readUrl('classpath://sfcalluserbyidtest\mock_payload.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://sfcalluserbyidtest\mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="path" value="#[output application/java --- readUrl('classpath://sfcalluserbyidtest\mock_variable_.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="request" value="#[output application/java --- readUrl('classpath://sfcalluserbyidtest\mock_variable_1.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="uriParameters" value="#[output application/java --- readUrl('classpath://sfcalluserbyidtest\mock_variable_2.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://sfcalluserbyidtest\mock_variable_3.dwl')]" />
+						<munit-tools:variable key="method" value="#[output application/java --- readUrl('classpath://sfcalluserbyidtest\mock_variable_4.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="queryParameters" value="#[output application/java --- readUrl('classpath://sfcalluserbyidtest\mock_variable_5.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="7109c3a7-a8ca-4e56-98ae-f9637e7e4f63" >
+				<munit:payload value="#[readUrl('classpath://sfcalluserbyidtest\set-event_payload1.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://sfcalluserbyidtest\set-event_attributes1.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://sfcalluserbyidtest\set-event_variable_1.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to sf-call-user-by-id" doc:id="cc5fbd5f-a1fd-46da-95c2-7829dbbf13dd" name="sf-call-user-by-id"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="ccfdf4b0-3405-4cff-a298-2bc4b694b323" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import sfcalluserbyidtest::assert_expression_payload1
+---
+assert_expression_payload1::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="sf-call-mock-sapi-test" doc:id="558d3253-5e62-4484-9eac-b3e50352f965" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock RESTful API" doc:id="39cdefdd-ccad-4096-8032-dce538d03aaf" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="1d66fe8a-7746-4671-a390-6749565e2426" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json --- readUrl('classpath://sfcallmocksapitest\mock_payload.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://sfcallmocksapitest\mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="path" value="#[output application/java --- readUrl('classpath://sfcallmocksapitest\mock_variable_.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="request" value="#[output application/java --- readUrl('classpath://sfcallmocksapitest\mock_variable_1.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="uriParameters" value="#[output application/java --- readUrl('classpath://sfcallmocksapitest\mock_variable_2.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://sfcallmocksapitest\mock_variable_3.dwl')]" />
+						<munit-tools:variable key="method" value="#[output application/java --- readUrl('classpath://sfcallmocksapitest\mock_variable_4.dwl')]" mediaType="application/java" encoding="UTF-8" />
+						<munit-tools:variable key="queryParameters" value="#[output application/java --- readUrl('classpath://sfcallmocksapitest\mock_variable_5.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="23956d09-00eb-4c9d-a06a-3ac7b9f87b2b" >
+				<munit:payload value="#[readUrl('classpath://sfcallmocksapitest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://sfcallmocksapitest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="path" value="#[output application/java --- readUrl('classpath://sfcallmocksapitest\set-event_variable_.dwl')]" encoding="UTF-8" mediaType="application/java" />
+					<munit:variable key="uriParameters" value="#[output application/java --- readUrl('classpath://sfcallmocksapitest\set-event_variable_1.dwl')]" encoding="UTF-8" mediaType="application/java" />
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://sfcallmocksapitest\set-event_variable_2.dwl')]" />
+					<munit:variable key="method" value="#[output application/java --- readUrl('classpath://sfcallmocksapitest\set-event_variable_3.dwl')]" encoding="UTF-8" mediaType="application/java" />
+					<munit:variable key="queryParameters" value="#[output application/java --- readUrl('classpath://sfcallmocksapitest\set-event_variable_4.dwl')]" encoding="UTF-8" mediaType="application/java" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to sf-call-mock-sapi" doc:id="2cf416aa-cab9-42dc-bec1-404512c851a6" name="sf-call-mock-sapi"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="0d4a2bbe-f429-4306-9ded-a66e726028e3" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import sfcallmocksapitest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

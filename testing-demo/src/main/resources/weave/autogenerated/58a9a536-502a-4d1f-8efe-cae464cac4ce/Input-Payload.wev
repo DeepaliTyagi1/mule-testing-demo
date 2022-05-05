@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_58a9a536_502a_4d1f_8efe_cae464cac4ce_Input_Payload = Array<{  empId?: String,   firstName?: String,   lastName?: String,   company?: String,   _?: Any}>
+

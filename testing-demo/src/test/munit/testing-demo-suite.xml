@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="testing-demo-suite.xml" />
+	<munit:test name="get:\user\(userId):testing-demo-config-test" doc:id="5c8e690a-cbb8-43ef-8743-86eefa0a7275" >
+		<munit:behavior >
+			<munit-tools:spy doc:name="Spy sf-call-user-by-id" doc:id="a7205a2a-7703-4625-a54a-6f79d7ff1127" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="b682db73-bba0-4ce7-8a02-09c6371fb238" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:before-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="f86c95cc-3467-4306-b400-5aba7be562a2" message="The payload does not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import getuseruserIdtestingdemoconfigtest::spy_assert_payload
+---
+spy_assert_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:before-call>
+				<munit-tools:after-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="c7d23ebf-657a-4f2f-9f99-5d961a02b00e" message="The payload does not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import getuseruserIdtestingdemoconfigtest::spy_assert_payload1
+---
+spy_assert_payload1::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:after-call>
+			</munit-tools:spy>
+			<munit:set-event doc:name="Set Input" doc:id="42aaffa0-866e-4da5-895c-75f0395bb19f" >
+				<munit:payload value="#[readUrl('classpath://getuseruserIdtestingdemoconfigtest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://getuseruserIdtestingdemoconfigtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://getuseruserIdtestingdemoconfigtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\user\(userId):testing-demo-config" doc:id="80f33e93-968d-4f1f-a5da-8393dcfcdf7f" name="get:\user\(userId):testing-demo-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="c34342d4-46be-432f-b957-f4e6b5b4e527" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import getuseruserIdtestingdemoconfigtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify sf-call-user-by-id" doc:id="4a1ef564-423e-4ee3-99e1-b27409a69f9a" processor="flow-ref" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="b682db73-bba0-4ce7-8a02-09c6371fb238" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="get:\users:testing-demo-config-test" doc:id="c314e1ed-fb10-40e8-8336-071bad2cc4c8" >
+		<munit:behavior >
+			<munit-tools:spy doc:name="Spy sf-call-users" doc:id="c5e44f11-d54f-401c-b97c-fc3731739036" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="f5b44812-920d-418b-a925-e7fc0593d59e" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:before-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="bd183cf1-a5cd-47d3-843a-5a64440db017" message="The payload does not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import getuserstestingdemoconfigtest::spy_assert_payload
+---
+spy_assert_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:before-call>
+				<munit-tools:after-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="09e9f48e-0d71-4f49-832e-54f2d3f60397" message="The payload does not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import getuserstestingdemoconfigtest::spy_assert_payload1
+---
+spy_assert_payload1::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:after-call>
+			</munit-tools:spy>
+			<munit:set-event doc:name="Set Input" doc:id="364d0fdb-3633-4479-8312-7e374601f630" >
+				<munit:payload value="#[readUrl('classpath://getuserstestingdemoconfigtest\set-event_payload1.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://getuserstestingdemoconfigtest\set-event_attributes1.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://getuserstestingdemoconfigtest\set-event_variable_1.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\users:testing-demo-config" doc:id="f7a02355-08b8-4e95-afc7-c6aeb9778b14" name="get:\users:testing-demo-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="dff6c8ff-c4da-49b6-8a1f-2092d3cf1b90" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import getuserstestingdemoconfigtest::assert_expression_payload1
+---
+assert_expression_payload1::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify sf-call-users" doc:id="c27c30b1-75a6-48d7-93c5-ca9d9cd7ecaa" processor="flow-ref" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="f5b44812-920d-418b-a925-e7fc0593d59e" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

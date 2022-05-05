@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="05ce3d4a-0ce1-4d49-bc93-e8d4d202c6cb" basePath="/api" >
+		<http:request-connection host="testing-mock-sandbox-v1.us-e2.cloudhub.io" />
+	</http:request-config>
+	<sub-flow name="sf-call-user-by-id" doc:id="fe103524-3b80-417c-8a16-c36b1bebb7e5" >
+		<logger level="INFO" doc:name="Logger" doc:id="0f7ae11a-3244-4216-8890-99908362b888" message="START : user by id"/>
+		<ee:transform doc:name="Prepare Request" doc:id="8c10ee8a-c8a3-483f-ba70-2f4b9fc70dd6">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="path"><![CDATA[%dw 2.0
+output application/java
+---
+'/user/{userId}']]></ee:set-variable>
+				<ee:set-variable variableName="method"><![CDATA[%dw 2.0
+output application/java
+---
+'GET']]></ee:set-variable>
+				<ee:set-variable variableName="uriParameters"><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"userId" : attributes.uriParams[0]
+}]]></ee:set-variable>
+				<ee:set-variable variableName="queryParameters"><![CDATA[%dw 2.0
+output application/java
+---
+{
+	
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="sf-call-mock-sapi" doc:id="929352a7-6ea4-4d3e-8b92-dac4233415db" name="sf-call-mock-sapi"/>
+		<logger level="INFO" doc:name="Logger" doc:id="c7c52c89-07ed-49f9-bf99-833cc062f64f" message="END : user by id"/>
+	</sub-flow>
+	<sub-flow name="sf-call-users" doc:id="58a9a536-502a-4d1f-8efe-cae464cac4ce" >
+		<logger level="INFO" doc:name="Logger" doc:id="d2d6529d-d47a-43d8-852a-b6ab60b86090" message="START : users"/>
+		<ee:transform doc:name="Prepare Request" doc:id="92e98ed3-4afe-4e22-b39c-3ee84119c503">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="path"><![CDATA[%dw 2.0
+output application/java
+---
+'/users']]></ee:set-variable>
+				<ee:set-variable variableName="method"><![CDATA[%dw 2.0
+output application/java
+---
+'GET']]></ee:set-variable>
+				<ee:set-variable variableName="uriParameters"><![CDATA[%dw 2.0
+output application/java
+---
+{}]]></ee:set-variable>
+				<ee:set-variable variableName="queryParameters"><![CDATA[%dw 2.0
+output application/java
+---
+{
+	
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="sf-call-mock-sapi" doc:id="4817b78a-2d33-4955-862b-20c3b3817098" name="sf-call-mock-sapi"/>
+		<logger level="INFO" doc:name="Logger" doc:id="a1d17e7a-817b-4468-b75d-09492a714a00" message="END : users"/>
+	</sub-flow>
+	<sub-flow name="sf-call-mock-sapi" doc:id="514039c1-9f67-4a2d-b5b7-e0b197ae8919" >
+		<logger level="INFO" doc:name="LOG start flow" doc:id="0c13c49a-ff6f-41dc-8e4a-623824ed0f96" message="START : HTTP flow"/>
+		<ee:transform doc:name="Build Request" doc:id="275abe59-b362-413b-979e-09d4c6a6cdc3">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="request"><![CDATA[%dw 2.0
+output application/java
+var protocol = lower(p('mock-service.protocol'))
+var host = p('mock-service.host')
+var port = p('mock-service.port')
+var path = p('mock-service.basepath')  ++ vars.path
+---
+{
+	protocol: protocol,
+	method: vars.method,
+	endpoint: "$(protocol)://$(host):$(port)/$(path)",
+	transportHeaders: {
+		client_id: p('secure::mock-service.header.client_id'),
+		client_secret: p('secure::mock-service.header.client_secret')
+	},
+	uriParameters: vars.uriParameters,
+	queryParameters: vars.queryParameters
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request method="#[vars.request.method]" doc:name="RESTful API" doc:id="1d66fe8a-7746-4671-a390-6749565e2426" config-ref="https-request-config" url="#[vars.request.endpoint]" sendCorrelationId="ALWAYS" correlationId="#[correlationId]" responseTimeout="#[vars.request.timeout.response]">
+			<reconnect frequency="${request.reconnection.frequency}" count="${request.reconnection.attempts}" />
+			<http:headers><![CDATA[#[vars.request.transportHeaders]]]></http:headers>
+			<http:uri-params><![CDATA[#[vars.request.uriParameters]]]></http:uri-params>
+			<http:query-params><![CDATA[#[vars.request.queryParameters]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="LOG end flow" doc:id="fcfe5d8c-1700-4c60-b418-45f07bff0c21" message="END : user by id"/>
+	</sub-flow>
+</mule>

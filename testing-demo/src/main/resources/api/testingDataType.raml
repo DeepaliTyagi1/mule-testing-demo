@@ -1,0 +1,47 @@
+#%RAML 1.0 Library
+
+types:
+  getUserInfo:
+    type: object
+    properties:
+      empId:
+        type: string
+        required: false
+        description: User Id.
+        example: "1003"
+      firstName:
+        type: string
+        required: false
+        description: First Name of user.
+        example: "Keith"
+      lastName:
+        type: string
+        required: false
+        description: Last name of user.
+        example: "Caulder"
+      company:
+        type: string
+        required: false
+        description: company of user.
+        example: "Caulder Care Services Ltd"
+    example:
+      {
+    "empId": "1003",
+    "firstName": "Keith",
+    "lastName": "Caulder",
+    "company": "Caulder Care Services Ltd"
+  }
+  errorInfo:
+    type: object
+    properties:
+      errorCode:
+        type: string
+        required: true
+        example: "FAILED"
+      errorMessage:
+        type: string
+        required: false
+        example: "Request failed"
+      errorDetails:
+        type: any
+        required: false

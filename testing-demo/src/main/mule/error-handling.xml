@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	<error-handler name="error-handling" doc:id="bff82a47-fa08-4432-89cc-8fe7c1cc62d1" >
+		<on-error-propagate enableNotifications="true" logException="false" doc:name="On Error Propagate" doc:id="5399db7d-2679-4e7a-87b9-e905c2b712d5" type="APIKIT:BAD_REQUEST, APIKIT:METHOD_NOT_ALLOWED, APIKIT:NOT_ACCEPTABLE, APIKIT:NOT_FOUND, APIKIT:NOT_IMPLEMENTED, APIKIT:UNSUPPORTED_MEDIA_TYPE, CONSOLE:NOT_FOUND" >
+			<ee:transform doc:name="Transform Error Message" doc:id="64fae3b1-442b-4a72-a7cd-fed3d5b43632" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0 
+output application/json
+---
+{
+	errorCode: error.errorType.identifier,
+	errorMessage: error.description
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[if (error.errorType.identifier == "BAD_REQUEST") 
+400
+else if (error.errorType.identifier == "NOT_FOUND" or error.errorType.identifier == "APP:PATIENT_NOT_FOUND")
+404
+else if (error.errorType.identifier == "METHOD_NOT_ALLOWED")
+405
+else if (error.errorType.identifier == "NOT_ACCEPTABLE")
+406
+else if (error.errorType.identifier == "UNSUPPORTED_MEDIA_TYPE")
+415
+else if (error.errorType.identifier == "NOT_IMPLEMENTED")
+501
+else
+500
+]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="7637d40d-9397-4f7a-bb42-51e9136fb1ef" type="ANY">
+			<ee:transform doc:name="Transform Error Message" doc:id="b8e0d2ab-6874-4010-9fb7-3a86e5d8cc01" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0 
+output application/json
+---
+{
+	errorCode: 'FAILED',
+	errorMessage: error.description
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-continue>
+	</error-handler>
+</mule>

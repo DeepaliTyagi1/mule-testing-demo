@@ -1,0 +1,49 @@
+#%RAML 1.0
+title: testing-mock
+
+traits: 
+  client-id-enforcement: !include trait.raml
+  
+uses: 
+  tdt: testingDataType.raml
+
+/users:
+  get:
+    is: [client-id-enforcement]
+    responses:
+      200:
+        body:
+          application/json:
+            type: tdt.getUserInfo[]
+      400:
+        body:
+          application/json:
+            type: tdt.errorInfo
+      500:
+        body:
+          application/json:
+            type: tdt.errorInfo
+
+/user/{userId}:
+  uriParameters:
+    userId:
+      type: string
+      example: "1001"
+      description: user id to be fetched
+  get:
+    is: [client-id-enforcement]
+    responses:
+      200:
+        body:
+          application/json:
+            type: tdt.getUserInfo
+      400:
+        body:
+          application/json:
+            type: tdt.errorInfo
+      500:
+        body:
+          application/json:
+            type: tdt.errorInfo      
+        
+    

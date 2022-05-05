@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <http:listener-config name="testing-mock-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8082" />
+    </http:listener-config>
+    <apikit:config name="testing-mock-config" api="testing-mock.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="testing-mock-main">
+        <http:listener config-ref="testing-mock-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="testing-mock-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="testing-mock-console">
+        <http:listener config-ref="testing-mock-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="testing-mock-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="get:\user\(userId):testing-mock-config">
+        <logger level="INFO" doc:name="Logger" doc:id="ae0ba20b-3be7-4f43-8647-7995dc26fe10" message="LOG START FLOW: get:/user/{id} endpoint"/>
+		<ee:transform doc:name="Transform Message" doc:id="69226d25-dffb-4d24-8a1c-bfc577b98243" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var sampleData = [{
+		"userId": "1001",
+		"firstName": "Kevin",
+		"lastName": "Adam",
+		"company": "Adam Tiles Ltd"
+	},
+	{
+		"userId": "1002",
+		"firstName": "Lewis",
+		"lastName": "Neill",
+		"company": "Neill Beverages Ltd"
+	},
+	{
+		"userId": "1003",
+		"firstName": "Keith",
+		"lastName": "Caulder",
+		"company": "Caulder Care Services Ltd"
+	},
+	{
+		"userId": "1004",
+		"firstName": "Robert",
+		"lastName": "Virgil",
+		"company": "Virgil Logistics Ltd"
+	},
+	{
+		"userId": "1005",
+		"firstName": "Paul",
+		"lastName": "Neilsen",
+		"company": "Neilsen Coaches Ltd"
+	}
+]
+---
+(sampleData filter $.userId == attributes.uriParams[0])[0] default {}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" message="LOG END FLOW: get:/user/{id} endpoint" />
+    </flow>
+    <flow name="get:\users:testing-mock-config">
+        <logger level="INFO" message="LOG START FLOW: get:/users endpoint" doc:name="LOG START FLOW: get:/users endpoint"/>
+		<ee:transform doc:name="Transform Message" doc:id="3fd3e2fc-68ee-4466-bbf7-bf63fd57bd35" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[{
+		"userId": 1001,
+		"firstName": "Kevin",
+		"lastName": "Adam",
+		"company": "Adam Tiles Ltd"
+	},
+	{
+		"userId": 1002,
+		"firstName": "Lewis",
+		"lastName": "Neill",
+		"company": "Neill Beverages Ltd"
+	},
+	{
+		"userId": 1003,
+		"firstName": "Keith",
+		"lastName": "Caulder",
+		"company": "Caulder Care Services Ltd"
+	},
+	{
+		"userId": 1004,
+		"firstName": "Robert",
+		"lastName": "Virgil",
+		"company": "Virgil Logistics Ltd"
+	},
+	{
+		"userId": 1005,
+		"firstName": "Paul",
+		"lastName": "Neilsen",
+		"company": "Neilsen Coaches Ltd"
+	}
+]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="3a9e7138-2ec8-4d50-b2d9-9e7ee0ac5e89" message="LOG END FLOW: get:/users endpoint"/>
+    </flow>
+</mule>

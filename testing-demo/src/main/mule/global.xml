@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd 
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	
+	<global-property name="env" value="sandbox"/>
+    
+	 <http:listener-config name="testing-demo-httpListenerConfig">
+        <http:listener-connection host="${listener.host}" port="${listener.port}" />
+    </http:listener-config>
+    
+    <apikit:config name="testing-demo-config" api="testing-demo.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    
+	<!-- <global-property doc:id="f8c30c79-55a4-4841-938f-511cde167e04" name="secure.key" value="${secure.key}" />
+	 <secure-properties:config name="secure-properties-config" doc:name="Secure Properties Config" doc:id="9519ae6a-7f1a-4ed5-9e4b-c8a45f03202a" file="configs/${env}.yaml" key="${secure.key}" />
+	 -->
+	<configuration-properties doc:name="environmental-properties" doc:id="29f29dd3-4b02-4090-8792-48df62e92850" file="configs/${env}.yaml"/>
+	<configuration-properties doc:name="common-properties" doc:id="9ca2268c-794b-4862-94a5-f2bf0f189e22" file="configs/common.yaml"/>
+
+	<!-- <api-gateway:autodiscovery apiId="${autodiscovery.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="bc7e15b3-2d48-4491-809b-a1943648b091" flowRef="testing-demo-main" />
+	 -->
+	<http:request-config name="https-request-config" doc:name="HTTP Request configuration" doc:id="a19490fc-cfc5-4184-91ab-412083cd3091" responseTimeout="${request.timeout.response}">
+		<http:request-connection connectionIdleTimeout="${request.timeout.connection-idle}" protocol="HTTPS">
+			<tls:context >
+				<tls:trust-store insecure="true" />
+			</tls:context>
+		</http:request-connection>
+	</http:request-config>
+	    
+    <configuration doc:name="global-error-handler" doc:id="7ebf05d0-e0c2-49f0-9656-fb2729f1d837" defaultErrorHandler-ref="error-handling" />
+    
+</mule>

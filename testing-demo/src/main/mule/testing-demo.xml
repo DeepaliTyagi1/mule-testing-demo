@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <flow name="testing-demo-main">
+        <http:listener config-ref="testing-demo-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="testing-demo-config" />
+        <error-handler ref="error-handling" />
+    </flow>
+   <flow name="testing-demo-console">
+        <http:listener config-ref="testing-demo-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <set-variable value="${apikit.console.disabled}" doc:name="apikitConsoleDisabled" doc:id="07696c09-8c12-4812-bb7b-00e2d956cb04" variableName="apikitConsoleDisabled" />
+        <choice doc:name="Choice" doc:id="dccf9beb-9275-45e2-967f-2932f682f138">
+            <when expression="#[vars.apikitConsoleDisabled == &quot;false&quot;]">
+                <apikit:console config-ref="testing-demo-config" />
+            </when>
+            <otherwise>
+                <raise-error doc:name="Raise error" doc:id="89aced9f-9a28-4310-9a8f-12fe09c6f675" type="CONSOLE:NOT_FOUND" description="Console is not available." />
+            </otherwise>
+        </choice>
+        <error-handler ref="error-handling" />
+    </flow>
+    <flow name="get:\user\(userId):testing-demo-config">
+        <flow-ref doc:name="sf-call-user-by-id" doc:id="b682db73-bba0-4ce7-8a02-09c6371fb238" name="sf-call-user-by-id" />
+    </flow>
+    <flow name="get:\users:testing-demo-config">
+        <flow-ref doc:name="sf-call-users" doc:id="f5b44812-920d-418b-a925-e7fc0593d59e" name="sf-call-users" />
+    </flow>
+</mule>
